@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 const Checkboxes = () => {
   const [selectedData, setSelectedData] = useState([]);
   const [originalData, setOriginalData] = useState([]);
-  console.log("selected", selectedData);
 
   useEffect(() => {
     fetch("https://erick-mulindi-chat-server.glitch.me/messages")
@@ -20,10 +19,7 @@ const Checkboxes = () => {
   }, [originalData]);
 
   const checkBox = (e) => {
-    let childId = e.target.id;
-    let parentChildIds = childId.split("_");
-    let parentId = Number(parentChildIds[0])
-    childId = Number(parentChildIds[1]);
+    let childId = Number(e.target.id);
     let checkedItems = selectedData.map((parent) => {
       return parent.children.map((child) => {
         if (Number(child.id) === childId && child.isChecked === false) {
@@ -44,6 +40,23 @@ const Checkboxes = () => {
     setSelectedData(originalData);
   };
 
+  const submitData = (e) => {
+    e.preventDefault();
+    let dataToSubmit = selectedData.map((parent) => {
+      return parent.children.filter((item) => item.isChecked === true);
+    });
+    dataToSubmit.forEach((item) => {
+      item.forEach((item) => {
+        delete item.isChecked;
+      });
+    });
+    originalData.forEach((parent, index) => {
+      delete parent.isChecked;
+      parent["children"] = dataToSubmit[index];
+    });
+    console.log("Submitted Data", originalData);
+  };
+
   return (
     <div>
       <p>these are the check boxes</p>
@@ -62,12 +75,12 @@ const Checkboxes = () => {
                 </label>
                 <div>
                   {parent.children ? (
-                    parent.children.map((child, index) => {
+                    parent.children.map((child) => {
                       return (
                         <label key={child.id + 1}>
                           <input
                             onChange={(e) => checkBox(e)}
-                            id={parent.id + "_" + child.id}
+                            id={child.id}
                             type="checkbox"
                           />
                           {child.name}
@@ -85,7 +98,7 @@ const Checkboxes = () => {
           <></>
         )}
       </form>
-      <button>Submit</button>
+      <button onClick={submitData}>Submit</button>
     </div>
   );
 };
