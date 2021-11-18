@@ -21,14 +21,14 @@ const Checkboxes = () => {
   }, [originalData]);
 
   const checkBox = (e) => {
-    let childId = Number(e.target.id);
+    let childId = e.target.id;
     let checkedItems = selectedData.map((parent) => {
       return parent.children.map((child) => {
-        if (Number(child.id) === childId && e.target.checked === true) {
+        if (child.id === childId && e.target.checked === true) {
           submitData.push(child.id);
           return child;
         }
-        if (Number(child.id) === childId && e.target.checked === false) {
+        if (child.id === childId && e.target.checked === false) {
           let filteredData = submitData.filter((item) => item !== e.target.id);
           setSubmitData(filteredData);
           return child;
