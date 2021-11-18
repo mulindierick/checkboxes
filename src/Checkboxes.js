@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 const Checkboxes = () => {
+  const [submitData, setSubmitData] = useState([]);
   const [selectedData, setSelectedData] = useState([]);
   const [originalData, setOriginalData] = useState([]);
+  console.log("final data", submitData);
 
   useEffect(() => {
     fetch("https://erick-mulindi-chat-server.glitch.me/messages")
@@ -22,12 +24,13 @@ const Checkboxes = () => {
     let childId = Number(e.target.id);
     let checkedItems = selectedData.map((parent) => {
       return parent.children.map((child) => {
-        if (Number(child.id) === childId && child.isChecked === false) {
-          child.isChecked = true;
+        if (Number(child.id) === childId && e.target.checked === true) {
+          submitData.push(child.id);
           return child;
         }
-        if (Number(child.id) === childId && child.isChecked === true) {
-          child.isChecked = false;
+        if (Number(child.id) === childId && e.target.checked === false) {
+          let filteredData = submitData.filter((item) => item !== e.target.id);
+          setSubmitData(filteredData);
           return child;
         } else {
           return child;
@@ -38,23 +41,6 @@ const Checkboxes = () => {
       parent["children"] = checkedItems[index];
     });
     setSelectedData(originalData);
-  };
-
-  const submitData = (e) => {
-    e.preventDefault();
-    let dataToSubmit = selectedData.map((parent) => {
-      return parent.children.filter((item) => item.isChecked === true);
-    });
-    dataToSubmit.forEach((item) => {
-      item.forEach((item) => {
-        delete item.isChecked;
-      });
-    });
-    originalData.forEach((parent, index) => {
-      delete parent.isChecked;
-      parent["children"] = dataToSubmit[index];
-    });
-    console.log("Submitted Data", originalData);
   };
 
   return (
@@ -98,7 +84,7 @@ const Checkboxes = () => {
           <></>
         )}
       </form>
-      <button onClick={submitData}>Submit</button>
+      <button>Submit</button>
     </div>
   );
 };
